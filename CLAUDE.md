@@ -88,8 +88,7 @@ Flags: `--preflight-only` (check Chrome + hh login + extension login, then exit)
 
 Notes / known limits:
 - hh's candidate list shows **~52 per posting** at a time; moving processed candidates out of "Все" lets the next batch load (how we page past the cap).
-- The "Подумать" move is **~80% reliable** (hh's React UI intermittently swallows the automated click); a failed move just leaves the candidate in "Все" (logged) — uploads are unaffected.
-- hh ignores synthetic JS clicks — these controls are driven with CDP `Input` (trusted) mouse events.
+- A failed "Подумать" move just leaves the candidate in "Все" (logged) — uploads are unaffected.
 
 ---
 
@@ -97,6 +96,7 @@ Notes / known limits:
 
 - **ALWAYS download CVs to disk** when screening, unless explicitly told otherwise. `src/download_harmony_candidates.py` saves each résumé as text under `data/<vacancy>/`. Do not keep them only in memory.
 - **Do NOT write keyword-based scoring scripts for ranking.** Download the CVs, then **READ each file yourself** (READ — not grep/search/keyword-count) and judge quality on actual content (experience, employers, education, relevance to the role). Fanning out subagents that each read full CVs is fine; keyword heuristics are not.
+- **Do NOT click by coordinates (x/y) — drive the UI through the DOM** (`element.click()` + selectors, waiting on DOM predicates), for as long as that works. This applies to Harmony **and** hh.ru (hh's React controls accept DOM clicks — that was verified end-to-end). Coordinate / CDP `Input` mouse clicks are brittle (stale coords when the list re-renders, buttons below the fold, focus races) and were the cause of the flaky "Подумать" move — only fall back to them if a specific control genuinely cannot be driven via the DOM.
 
 ---
 

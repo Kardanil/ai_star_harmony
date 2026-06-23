@@ -19,8 +19,9 @@ How the extension is driven (no clickable toolbar icon over CDP):
   So we open the resume in a tab, keep it ACTIVE, open popup.html as a background
   target, then pick vacancy+stage and click "ВЗЯТЬ НА ВАКАНСИЮ".
 
-hh ignores synthetic JS clicks on its React controls — the "Пригласить"/"Подумать"/
-"Изменить статус" path is driven with CDP Input.dispatchMouseEvent (trusted clicks).
+All UI is driven with DOM clicks (element.click() via selectors) — NO coordinate /
+CDP Input mouse events anywhere (see the "no x/y clicks" rule in CLAUDE.md).
+The "Пригласить" → "Подумать" → "Изменить статус" path works fine with DOM clicks.
 
 Prereqs: Chrome on --port with the HarmonyHunter extension, logged into BOTH
 hh.ru (employer) AND app.harmonyats.org. Run preflight() first (the script does).
@@ -113,26 +114,22 @@ class CDP:
         time.sleep(settle)
         self.cmd("Target.activateTarget", {"targetId": target_id})
 
-    def click_xy(self, sid, x, y):
-        """Trusted mouse click (hh's React ignores JS .click())."""
-        for ty in ("mouseMoved", "mousePressed", "mouseReleased"):
-            p = {"type": ty, "x": x, "y": y}
-            if ty != "mouseMoved":
-                p.update(button="left", clickCount=1)
-            self.cmd("Input.dispatchMouseEvent", p, sid=sid)
-            time.sleep(0.05)
+    def click(self, sid, finder_js):
+        """DOM-click the element returned by finder_js (a JS expression yielding
+        an element, or null). Returns True if an element was found and clicked.
+        We drive hh with real DOM clicks — NO coordinate/Input clicks (see the
+        'no x/y clicks' rule in CLAUDE.md); they register fine and avoid the
+        coordinate fragility (off-screen elements, scroll/focus races)."""
+        return bool(self.evalp(sid,
+            "(()=>{const e=(%s);if(!e)return false;e.scrollIntoView({block:'center'});e.click();return true})()" % finder_js))
 
-    def center(self, sid, finder_js, timeout=8.0):
-        """Return the viewport-center {x,y} of the element returned by finder_js
-        (a JS expression yielding an element), once it is visible; else None."""
-        deadline = time.time() + timeout
-        while time.time() < deadline:
-            r = self.evalp(sid, "(()=>{const e=(%s);if(!e)return null;e.scrollIntoView({block:'center'});"
-                                "const r=e.getBoundingClientRect();return (r.width>0&&r.height>0)?{x:r.x+r.width/2,y:r.y+r.height/2}:null})()" % finder_js)
-            if r:
-                return r
-            time.sleep(0.3)
-        return None
+    def wait(self, sid, cond_js, tries=12, gap=0.4):
+        """Poll until a JS boolean condition is true. Returns True/False."""
+        for _ in range(tries):
+            if self.evalp(sid, "!!(%s)" % cond_js):
+                return True
+            time.sleep(gap)
+        return False
 
 
 def js(s):
@@ -350,56 +347,48 @@ def _dialog_open(cdp, sid):
 
 def move_to_consider(cdp, sid, target_hash, send_message=True):
     """On the list tab, move the card for `target_hash` to status "Подумать":
-    Пригласить -> Подумать -> [keep/uncheck message] -> Изменить статус.
-    Verifies the card leaves the list. Returns 'moved' | 'failed: <why>'.
+    Пригласить -> Подумать -> [set message checkbox] -> Изменить статус.
 
-    Hardened against post-tab-churn click races: the list tab was just
-    reactivated, so the first click can be swallowed by a focus event and the
-    React dropdown/dialog can lag. Each step retries and is verified."""
-    invite_finder = (r"""(()=>{const a=[...document.querySelectorAll('a[href*="/resume/"]')].find(a=>(a.getAttribute('href')||'').includes(%s));"""
-                     r"""if(!a)return null;let c=a;for(let i=0;i<8&&c;i++){const b=[...c.querySelectorAll('button')].find(x=>/Пригласить/.test(x.innerText||''));if(b)return b;c=c.parentElement;}return null})()""") % js(target_hash)
-    time.sleep(0.8)  # let the reactivated list tab settle
+    PURE DOM clicks (no coordinates/Input — see CLAUDE.md). Verifies the card
+    leaves the list. Returns 'moved' | 'failed: <why>'. Retries the dropdown-open
+    (the list tab was just reactivated, so the very first click can lag)."""
+    invite = (r"""(()=>{const a=[...document.querySelectorAll('a[href*="/resume/"]')].find(a=>(a.getAttribute('href')||'').includes(%s));"""
+              r"""if(!a)return null;let c=a;for(let i=0;i<8&&c;i++){const b=[...c.querySelectorAll('button')].find(x=>/Пригласить/.test(x.innerText||''));if(b)return b;c=c.parentElement;}return null})()""") % js(target_hash)
+    consider_vis = "[...document.querySelectorAll(%s)].find(x=>x.getBoundingClientRect().width>0)" % js(CONSIDER_ITEM)
+    consider_seen = "[...document.querySelectorAll(%s)].some(x=>x.getBoundingClientRect().width>0)" % js(CONSIDER_ITEM)
+    commit_btn = "[...document.querySelectorAll('button')].find(x=>(x.innerText||'').trim().replace(/\\s+/g,' ')===%s&&x.getBoundingClientRect().width>0)" % js(COMMIT_BUTTON)
 
-    # 1+2. open the "Пригласить" dropdown and reveal "Подумать" — retry (a stale
-    #      menu or a swallowed first click is the usual cause of "not visible").
-    consider = None
+    time.sleep(0.6)  # let the reactivated list tab settle
+    # 1+2. open the card's "Пригласить" dropdown, then click the visible "Подумать"
+    opened = False
     for _ in range(4):
         _esc(cdp, sid); time.sleep(0.3)
-        invite = cdp.center(sid, invite_finder, timeout=5)
-        if not invite:
-            return "failed: invite button not found"
-        cdp.click_xy(sid, invite["x"], invite["y"])
-        consider = cdp.center(sid, "document.querySelector(%s)" % js(CONSIDER_ITEM), timeout=3.5)
-        if consider:
+        if not cdp.click(sid, invite):
+            time.sleep(0.5)
+            continue
+        if cdp.wait(sid, consider_seen, tries=8, gap=0.4) and cdp.click(sid, consider_vis):
+            opened = True
             break
-    if not consider:
-        return "failed: 'Подумать' menu item not visible"
-    cdp.click_xy(sid, consider["x"], consider["y"])
+    if not opened:
+        return "failed: could not open 'Подумать' menu"
 
-    # 3. wait for the "Изменить статус резюме" dialog
-    ok = False
-    for _ in range(16):
-        if _dialog_open(cdp, sid):
-            ok = True
-            break
-        time.sleep(0.4)
-    if not ok:
+    # 3. wait for the "Изменить статус резюме" dialog, then let it settle — the
+    #    message template loads async and the commit is a no-op until it's ready
+    #    (committing too early was the "dialog did not close" first-attempt fail).
+    if not cdp.wait(sid, "/%s/.test(document.body.innerText||'')" % STATUS_DIALOG_RE, tries=16, gap=0.4):
         return "failed: status dialog did not open"
+    time.sleep(1.0)
 
-    # optionally uncheck "Отправить сообщение"
-    if not send_message:
-        cb = cdp.center(sid, "[...document.querySelectorAll('input[type=checkbox]')].find(x=>x.checked && x.getBoundingClientRect().width>0)", timeout=2)
-        if cb:
-            cdp.click_xy(sid, cb["x"], cb["y"]); time.sleep(0.4)
+    # 4. set "Отправить сообщение" to the desired state (its default varies per
+    #    candidate); toggling re-renders the dialog, so settle before committing.
+    cdp.evalp(sid, "(()=>{const c=[...document.querySelectorAll('input[type=checkbox]')].find(x=>x.getBoundingClientRect().width>0);if(c&&c.checked!==%s)c.click();return 1})()" % ("true" if send_message else "false"))
+    time.sleep(0.6)
 
-    # 4. commit — retry until the dialog actually closes (a missed click leaves
-    #    it open and nothing commits, which looked like "card still in list").
+    # 5. commit — retry until the dialog closes
     committed = False
     for _ in range(3):
-        commit = cdp.center(sid, "[...document.querySelectorAll('button')].find(x=>(x.innerText||'').trim().replace(/\\s+/g,' ')===%s && x.getBoundingClientRect().width>0)" % js(COMMIT_BUTTON), timeout=4)
-        if not commit:
+        if not cdp.click(sid, commit_btn):
             break
-        cdp.click_xy(sid, commit["x"], commit["y"])
         for _ in range(12):
             time.sleep(0.4)
             if not _dialog_open(cdp, sid):
@@ -407,11 +396,12 @@ def move_to_consider(cdp, sid, target_hash, send_message=True):
                 break
         if committed:
             break
+        time.sleep(0.6)  # let the dialog become ready before re-clicking commit
     if not committed:
         return "failed: commit did not close the status dialog"
 
-    # 5. verify the card left the list (in-place removal; give it room)
-    for _ in range(24):
+    # 6. verify the card left the list (in-place removal)
+    for _ in range(20):
         time.sleep(0.5)
         if target_hash not in list_hashes(cdp, sid):
             return "moved"
