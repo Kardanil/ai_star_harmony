@@ -1,0 +1,132 @@
+Статус вакансии,Названии вакансии на hh,Ссылка на вакансию на hh,Название вакансии в crm,Описание вакансии
+Активна,Инженер по разработке AI-агентов (LLM),https://spb.hh.ru/vacancy/133606252?hhtmFrom=employer_vacancies,Kaspi / Инженер по разработке AI-агентов (LLM) /,"Инженер по разработке AI-агентов (LLM)
+
+Задачи:
+- проектирование и разработка сложного AI-агента для интеллектуального поиска на базе LLM (Gemini)
+- интеграция агента с базовыми сервисами: полнотекстовый поиск, векторный поиск, сервисы получения структуры данных
+- построение и оркестрация пайплайна агента: tool calling, маршрутизация запросов, сборка и ранжирование результатов
+- работа в предоставленной среде с доступами и набором сервисов, поднятие рабочего прототипа в сжатые сроки
+- проектирование и подготовка плана доработок от прототипа до релиза
+- оценка качества решения по метрикам, итеративное улучшение
+
+Требования:
+- сильный опыт построения сложных AI-агентов в production (приоритетное требование)
+- уверенное владение LLM-инструментарием: tool/function calling, RAG, оркестрация агентов
+- опыт работы с поисковыми системами: полнотекстовый и векторный поиск, ранжирование
+- сильный Python и опыт backend-разработки
+- умение быстро поднимать работающие прототипы и доводить их до релиза
+- сильные софт-скиллы: умение защищать своё решение, объяснять выбор подхода и интерпретировать метрики перед руководством
+- опыт с Gemini / Google AI-стеком будет преимуществом"
+,,https://spb.hh.ru/vacancy/133606251?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606250?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606249?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606248?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606247?hhtmFrom=employer_vacancies,,
+Активна,ML-инженер по обучению LLM,https://spb.hh.ru/vacancy/133606466?hhtmFrom=employer_vacancies,Kaspi / ML-инженер по обучению LLM,"ML-инженер по обучению LLM
+
+Задачи:
+- обучение собственных gpt-like языковых моделей (QWEN, LLAMA и аналоги) с нуля
+- развитие и продолжение существующих экспериментов по обучению моделей
+- работа с полным циклом: сбор и подготовка текстовых датасетов, обучение векторизатора, подготовка векторизированных версий текстов
+- инициализация и обучение моделей (в т.ч. с нуля), подбор архитектуры и гиперпараметров
+- оценка качества моделей, проведение экспериментов и итеративное улучшение результатов
+
+Требования:
+- опыт обучения gpt-like LLM-моделей (QWEN, LLAMA и аналоги) с нуля (приоритетное требование)
+- глубокое понимание процесса обучения: инициализация весов, подготовка датасетов, тренировочный пайплайн
+- опыт работы с векторизаторами и подготовкой текстовых данных
+- сильный Python и опыт с ML-фреймворками (PyTorch и др.)
+- понимание distributed training и работы с GPU
+- как альтернатива: сильный опыт качественного файн-тюнинга предобученных gpt-like моделей"
+,,https://spb.hh.ru/vacancy/133606465?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606464?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606463?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606462?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606461?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133606460?hhtmFrom=employer_vacancies,,
+Активна,RAG / LLM инженер,https://spb.hh.ru/vacancy/133524130?hhtmFrom=employer_vacancies,КРИТ / RAG / LLM инженер,"  Задачи:
+
+  - построение корпоративной RAG-системы для интеллектуального поиска по документам
+  - разработка ingestion / indexing pipeline: загрузка, парсинг, OCR, чанкинг, эмбеддинги
+  - реализация retrieval / query pipeline: hybrid search, reranking, сборка контекста для LLM
+  - работа с векторными БД, метаданными, ACL, версиями документов и SSO-доступом
+  - разработка API для поиска, извлечения чанков / документов и интеграции с UI
+
+  Требования:
+
+  - практический опыт с RAG-системами и LLM в production
+  - сильный Python и опыт backend-разработки API
+  - опыт с embeddings, vector DB, BM25 / hybrid search, reranking
+  - понимание парсинга документов: PDF, DOCX, таблицы, OCR, structured extraction
+  - опыт с LangChain / LlamaIndex / Qdrant / Milvus / OpenSearch или аналогами
+  - понимание безопасности данных: ACL, tenant isolation, JWT / SSO будет преимуществом"
+,,https://spb.hh.ru/vacancy/133524129?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524128?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524127?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524126?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524125?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524125?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524124?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524123?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524122?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524121?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133524120?hhtmFrom=employer_vacancies,,
+Активна,Applied ML / Signal Processing Engineer,https://spb.hh.ru/vacancy/133013202?hhtmFrom=employer_vacancies,ВТБ / Applied ML / Signal Processing Engineer,"Задачи:
+
+- анализ сигналов, логов, телеметрии, транзакционных и событийных данных;
+- разработка ML / statistical / rule-based алгоритмов для детекции аномалий и нестандартных состояний;
+- работа с временными рядами, последовательностями событий и неполными данными;
+- feature engineering, построение baseline-моделей и проверка гипотез;
+- валидация качества алгоритмов на исторических и production-данных;
+- доведение прототипов до production-ready состояния совместно с инженерной командой;
+- анализ ошибок, edge cases, drift и устойчивости алгоритмов.
+
+Требования:
+
+- опыт в роли ML Engineer / Data Scientist / Algorithm Engineer / Research Engineer;
+- сильная база в статистике, прикладной математике, ML или signal processing;
+- опыт работы с временными рядами, логами, telemetry / sensor / event data;
+- понимание anomaly detection, classification, clustering, pattern recognition;
+- уверенный Python, pandas / numpy / scipy / scikit-learn / PyTorch;
+- умение работать с грязными, шумными и несбалансированными данными;
+- способность выбирать практичные алгоритмические решения и объяснять их логику."
+,,https://spb.hh.ru/vacancy/133013201?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013200?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013199?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013198?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013197?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013196?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013195?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013194?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013193?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/133013192?hhtmFrom=employer_vacancies,,
+Активна,Data Science / Machine Learning Аналитик ERP,https://spb.hh.ru/vacancy/132423902?hhtmFrom=employer_vacancies,СБЕР / Data Science / ML Аналитик ERP,"Задачи:
+
+- построение ML-аналитической системы поверх ERP-данных;
+
+- подготовка признаков и бизнес-метрик на основе транзакционных данных ERP;
+
+- проектирование end-to-end пайплайнов: от данных и обучения моделей до production inference и мониторинга;
+
+- интеграция аналитики и ML в процессы продаж, закупок, склада, финансов и операций
+
+Требования:
+
+- опыт работы с ERP-системами в крупной компании;
+
+- практический опыт в Data Science / Machine Learning.
+
+
+- сильный Python и SQL
+
+
+- опыт работы с табличными и временными данными
+
+
+- понимание бизнес-процессов: продажи, закупки, запасы, ценообразование, финансы
+
+
+- опыт вывода ML-решений в продакшн будет преимуществом"
+,,https://spb.hh.ru/vacancy/132423901?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/132423900?hhtmFrom=employer_vacancies,,
+,,https://spb.hh.ru/vacancy/132423899?hhtmFrom=employer_vacancies,,
