@@ -420,11 +420,12 @@ def move_to_consider(cdp, sid, target_hash, send_message=True):
 
 # ----------------------------------------------------------------------- main loop
 def process_vacancy(cdp, list_tid, list_sid, vac, stage, limit, send_message,
-                    do_consider, dry, scope):
+                    do_consider, dry, scope, skip_prefixes=None):
     """Live top-of-list processing across all hh postings for the CRM vacancy."""
     results = []
     skip = set()      # hashes we gave up on (upload failed) — leave them in "Все"
     done = set()      # hashes uploaded (and moved, if do_consider)
+    skip_prefixes = tuple(p for p in (skip_prefixes or []) if p)
     for vid in vac["hh_ids"]:
         cdp.navigate(list_sid, list_tid, RESP_URL.format(vid=vid), settle=6)
         print(f"\n=== posting {vid} | Все={all_count(cdp, list_sid)} ===", flush=True)
@@ -433,7 +434,8 @@ def process_vacancy(cdp, list_tid, list_sid, vac, stage, limit, send_message,
             if limit and len(done) >= limit:
                 print(f"  reached --limit {limit}", flush=True)
                 return results
-            todo = [h for h in list_hashes(cdp, list_sid) if h not in skip and h not in done]
+            todo = [h for h in list_hashes(cdp, list_sid)
+                    if h not in skip and h not in done and not h.startswith(skip_prefixes)]
             if not todo:
                 # backfill from the larger pool (this is how we page past ~52/posting)
                 ac = all_count(cdp, list_sid)
@@ -484,6 +486,7 @@ def main():
     ap.add_argument("--no-message", action="store_true", help="when moving to Подумать, uncheck 'Отправить сообщение'")
     ap.add_argument("--dry", action="store_true", help="extension selects vacancy+stage but never saves; no Подумать move")
     ap.add_argument("--preflight-only", action="store_true", help="run the preflight checks and exit")
+    ap.add_argument("--skip-prefix-file", help="one resume hash prefix per line to skip when resuming after an interrupted run")
     ap.add_argument("--out", default="data/uploads")
     args = ap.parse_args()
 
@@ -497,9 +500,15 @@ def main():
         return 0
     print(f"Vacancy: {vac['crm']}  |  {len(vac['hh_ids'])} hh postings  |  consider={not args.no_consider}  message={not args.no_message}  dry={args.dry}", flush=True)
 
+    skip_prefixes = []
+    if args.skip_prefix_file:
+        skip_prefixes = [line.strip() for line in Path(args.skip_prefix_file).read_text(encoding="utf-8").splitlines()
+                         if line.strip() and not line.lstrip().startswith("#")]
+        print(f"Skipping {len(skip_prefixes)} previously processed hash prefixes", flush=True)
+
     results = process_vacancy(cdp, list_tid, list_sid, vac, args.stage, args.limit,
                               send_message=not args.no_message, do_consider=not args.no_consider,
-                              dry=args.dry, scope=args.scope)
+                              dry=args.dry, scope=args.scope, skip_prefixes=skip_prefixes)
 
     # safety sweep: close any leftover popup / success tabs
     for t in cdp.targets():

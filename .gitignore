@@ -1,17 +1,23 @@
-# Logged-in Chrome sessions / profiles — credentials/cookies. NEVER commit.
+# Logged-in Chrome sessions / profiles: credentials/cookies. Never commit.
 chrome-profile/
 .chrome_ds4/
 
-# Local harness config
+# Local virtual environments.
+.venv/
+
+# Local harness config.
 .claude/
 
-# Downloaded résumés + per-vacancy data — candidate PII. NEVER commit.
+# Downloaded resumes + per-vacancy data: candidate PII. Never commit.
 data/
+
+# Temporary local clone used for comparison.
+ai_star_harmony_new/
 
 # Archived earlier code + old CV dumps (PII, large). Not part of the live tool.
 old_algo/
 
-# Build/throwaway
+# Build/throwaway.
 hrstuff-code.zip
 __pycache__/
 *.pyc
